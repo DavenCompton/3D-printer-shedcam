@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="To Monitor a 3D Printer remotely">
+  <meta name="author" content="Daven">
+  <link rel="icon" href="{{ url_for('static', filename = 'favicon.ico') }}">
+  <title>3D Printer Monitor</title>
+ 
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+  <script>
+    var socket = io.connect(window.location.host, {
+        reconnection: false
+      });
+  
+      socket.on('connect', () => {
+        console.log('Connected');
+      });
+  
+      socket.on('disconnect', () => {
+        console.log('Disconnected');
+      });
+  
+      socket.on('connect_error', (error) => {
+        console.log('Connect error! ' + error);
+      });
+  
+      socket.on('connect_timeout', (error) => {
+        console.log('Connect timeout! ' + error);
+      });
+  
+      socket.on('error', (error) => {
+        console.log('Error! ' + error);
+      });
+  
+      // Update image and text data based on incoming data messages
+      socket.on('server2web', function(msg) {
+        document.getElementById("streamer-image").setAttribute('src', 'data:image/jpeg;base64,' + msg.image);
+        document.getElementById("ext-temp").innerHTML = 'External Temperature: ' + msg.ext_temp + '°C';
+        document.getElementById("int-temp").innerHTML = 'External Temperature: ' + msg.int_temp + '°C';
+        //console.log(msg.int_temp)
+      });
+
+      function toggle_switch() {
+        console.log('Light has been toggled');
+        socket.emit('toggle clicked', {'state': 'True'});
+      }
+  </script>
+</head>
+
+<body class="bkgrnd">
+    <div class="header1">
+        <h1>3D Printer Monitor</h1>
+    </div>
+  
+    <div class="light-controller">
+        <p><button onclick="toggle_switch()">Toggle Light</button></p>
+    </div>
+
+    <div class="temperatures">
+        <p id="ext-temp"></p>
+        <p id="int-temp"></p>
+    </div>
+  
+    <div style="width: 70%">
+        <img id="streamer-image" src="">
+    </div>
+  </body>
+  </html>
+
